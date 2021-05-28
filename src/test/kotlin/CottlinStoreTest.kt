@@ -6,10 +6,13 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class CottlinStoreTest {
     private val channel = Channel<ChannelMessage>();
-    private var store: CottlinStore = CottlinStore(channel)
+    private var storeRoom: StoreRoom = StoreRoom()
+    private var store: CottlinStore = CottlinStore(storeRoom, channel)
 
     @BeforeEach
     fun setUp() {
+        storeRoom.inventory["apple"] = Item("apple", 0.60, 10)
+        storeRoom.inventory["orange"] = Item("orange", 0.25, 8)
     }
 
 
@@ -18,10 +21,10 @@ internal class CottlinStoreTest {
         // TODO: figure out how to turn off specials for this test
 
         var invalidItemList1 = mutableListOf("orange", "banana", "apple")
-        assertEquals(Pair(-1.0, "banana"), store.parseOrder(invalidItemList1))
+        assertEquals(Pair(-1.0, "Invalid item ordered: [banana]."), store.parseOrder(invalidItemList1))
 
         var invalidItemList2 = mutableListOf("apple", "")
-        assertEquals(Pair(-1.0, ""), store.parseOrder(invalidItemList2))
+        assertEquals(Pair(-1.0, "Invalid item ordered: []."), store.parseOrder(invalidItemList2))
 
         var item1List = mutableListOf("orange", "orange", "apple")
         assertEquals(Pair(0.5 + 0.6, "OK"), store.parseOrder(item1List))

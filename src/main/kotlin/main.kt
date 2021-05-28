@@ -2,15 +2,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.coroutines.coroutineContext
 
 data class ChannelMessage(val type: String, val total: Double, val msg: String?) {
-    //    val time: String = LocalTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)
     val time: String = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
 }
-
 fun main(args: Array<String>) {
     println("MAIN: Starting application...")
+    val storeRoom = StoreRoom()
     val scope = CoroutineScope(Job())
     val channel = Channel<ChannelMessage>(Channel.UNLIMITED);
     channel.invokeOnClose {
@@ -18,7 +16,7 @@ fun main(args: Array<String>) {
         scope.coroutineContext.cancelChildren()
     }
     val storeJob = scope.launch {
-        CottlinStore(channel).start()
+        CottlinStore(storeRoom, channel).start()
     }
     val mailJob = scope.launch {
         MailService(channel).start()
